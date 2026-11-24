@@ -1,0 +1,20 @@
+- name: Check DevOps tools on this machine
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Check each tool is installed
+      ansible.builtin.command: "{{ item }}"
+      loop:
+        - docker --version
+        - kubectl version --client
+        - kind version
+        - helm version
+        - terraform version
+        - trivy --version
+      register: tool_check
+      changed_when: false
+
+    - name: Show results
+      ansible.builtin.debug:
+        msg: "{{ item.stdout_lines[0] | default('missing') }}"
+      loop: "{{ tool_check.results }}"
